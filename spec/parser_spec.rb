@@ -47,4 +47,20 @@ describe JsonRPC::Parser do
       expect(request).to be_notification
     end
   end
+
+  context "when rpc called with invalid JSON" do
+    it "raises an error" do
+      request_body = '{"jsonrpc": "2.0", "method": "foobar, "params": "bar", "baz]'
+
+      expect { @parser.parse(request_body) }.to raise_error(JsonRPC::InvalidJSONError)
+    end
+  end
+
+  context "when rcp called with an invalid request object" do
+    it "raises an error" do
+      request_body = '{"jsonrpc": "2.0", "method": 1, "params": "bar"}'
+
+      expect { @parser.parse(request_body) }.to raise_error(JsonRPC::InvalidRequestError)
+    end
+  end
 end
