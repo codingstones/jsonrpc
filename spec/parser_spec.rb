@@ -12,7 +12,7 @@ describe JsonRPC::Parser do
     end
 
     it "parses version" do
-      expect(@request.version).to eq(2.0)
+      expect(@request.version).to eq("2.0")
     end
 
     it "parses method name" do
