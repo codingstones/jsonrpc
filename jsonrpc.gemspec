@@ -5,13 +5,13 @@ require 'jsonrpc/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "jsonrpc"
-  spec.version       = Jsonrpc::VERSION
-  spec.authors       = ["Néstor Salceda"]
-  spec.email         = ["nestor.salceda@gmail.com"]
+  spec.version       = JsonRPC::VERSION
+  spec.authors       = ["The Coding Stones"]
+  spec.email         = ["yeah@codingstones.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{A json rpc 2.0 parser and response builder}
+  spec.description   = %q{An utility for our development stuff}
+  spec.homepage      = "https://github.com/codingstones/jsonrpc"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'

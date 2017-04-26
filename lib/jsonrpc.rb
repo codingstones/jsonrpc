@@ -1,5 +1,5 @@
 require "jsonrpc/version"
 
-module Jsonrpc
+module JsonRPC
   # Your code goes here...
 end
