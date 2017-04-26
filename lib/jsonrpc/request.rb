@@ -5,7 +5,7 @@ module JsonRPC
     def initialize(args)
       @version = args[:jsonrpc]
       @method = args[:method]
-      @params = args[:params]
+      @params = args[:params] || []
       @id = args[:id]
     end
 
