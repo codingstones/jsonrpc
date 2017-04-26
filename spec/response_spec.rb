@@ -6,7 +6,7 @@ describe JsonRPC::Response do
     before(:each) do
       response = JsonRPC::Response.new(request_id: an_id, result: a_result)
 
-      @serialized = response.as_json
+      @serialized = response.to_json
     end
 
     it "contains a jsonrpc field" do
@@ -30,7 +30,7 @@ describe JsonRPC::Response do
         @error = JsonRPC::InvalidRequestError.new
         response = JsonRPC::Response.new(request_id: an_id, result: a_result, error: @error)
 
-        @serialized = response.as_json
+        @serialized = response.to_json
       end
 
       it "contains an error field" do
