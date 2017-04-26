@@ -40,7 +40,7 @@ module JsonRPC
       begin
         parsed = MultiJson.load(request_body, symbolize_keys: true)
 
-        unless parsed[:params].kind_of? (Array) or parsed[:params].kind_of? (Hash)
+        unless is_array_or_hash?(parsed[:params])
           raise InvalidRequestError
         end
 
@@ -48,6 +48,12 @@ module JsonRPC
       rescue MultiJson::ParseError
         raise InvalidJSONError
       end
+    end
+
+    private
+
+    def is_array_or_hash?(params)
+      params.kind_of? (Array) or params.kind_of? (Hash)
     end
   end
 end
