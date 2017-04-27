@@ -132,4 +132,23 @@ describe JsonRPC::Parser do
       end
     end
   end
+
+  context "when parsing a batch" do
+    it "parses all requests in the batch" do
+      request_body = %Q{[
+        {"jsonrpc": "2.0", "method": "notify_sum", "params": [1, 2, 4], "id": 30},
+        {"jsonrpc": "2.0", "method": "notify_hello", "params": [7], "id": 31}
+      ]}
+
+      requests = @parser.parse(request_body)
+
+      expect(requests.length).to eq(2)
+      expect(requests[0].method).to eq("notify_sum")
+      expect(requests[0].params).to eq([1, 2, 4])
+      expect(requests[0].id).to eq(30)
+      expect(requests[1].method).to eq("notify_hello")
+      expect(requests[1].params).to eq([7])
+      expect(requests[1].id).to eq(31)
+    end
+  end
 end
