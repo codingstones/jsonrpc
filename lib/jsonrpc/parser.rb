@@ -4,18 +4,22 @@ require 'dry-validation'
 module JsonRPC
   class Parser
     def parse(request_body)
-      parsed = MultiJson.load(request_body, symbolize_keys: true)
+      parsed = parse_json(request_body)
 
       if batch_request?(parsed)
         parsed.map { |current| build_request(current) }
       else
         build_request(parsed)
       end
-    rescue MultiJson::ParseError
-      raise InvalidJSONError
     end
 
     private
+
+    def parse_json(request_body)
+      MultiJson.load(request_body, symbolize_keys: true)
+    rescue MultiJson::ParseError
+      raise InvalidJSONError
+    end
 
     def batch_request?(parsed)
       parsed.is_a?(Array)
