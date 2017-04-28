@@ -7,10 +7,15 @@ module JsonRPC
       @method = args[:method]
       @params = args[:params] || []
       @id = args[:id]
+      @invalid = args[:invalid] || false
     end
 
     def notification?
       @id.nil?
+    end
+
+    def invalid?
+      @invalid == true
     end
   end
 end

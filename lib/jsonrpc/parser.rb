@@ -7,9 +7,9 @@ module JsonRPC
       parsed = parse_json(request_body)
 
       if batch_request?(parsed)
-        parsed.map { |current| build_request(current) }
+        parsed.map { |current| create_request(current) }
       else
-        build_request(parsed)
+        create_request(parsed)
       end
     end
 
@@ -25,13 +25,17 @@ module JsonRPC
       parsed.is_a?(Array)
     end
 
-    def build_request(parsed)
+    def validate(parsed)
       validation = RequestSchema.call(parsed)
+      validated = validation.to_h
       if validation.failure?
-        raise InvalidRequestError
+        validated[:invalid] = true
       end
+      validated
+    end
 
-      Request.new(validation.to_h)
+    def create_request(parsed)
+      Request.new(validate(parsed))
     end
   end
 

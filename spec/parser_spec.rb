@@ -58,46 +58,56 @@ describe JsonRPC::Parser do
   context "when rcp called with an invalid request object" do
     context "when checking jsonrpc field" do
       context "and jsonrpc is different than '2.0'" do
-        it "raises an error" do
+        it "returns an invalid request" do
           request_body = '{"jsonrpc": "3.0", "method": "subtract", "params": [42, 23], "id": 1}'
 
-          expect { @parser.parse(request_body) }.to raise_error(JsonRPC::InvalidRequestError)
+          request = @parser.parse(request_body)
+
+          expect(request).to be_invalid
         end
       end
     end
 
     context "when checking method field" do
       context "and is not present" do
-        it "raises an error" do
+        it "returns an invalid request" do
           request_body = '{"jsonrpc": "2.0", "params": [42, 23], "id": 1}'
 
-          expect { @parser.parse(request_body) }.to raise_error(JsonRPC::InvalidRequestError)
+          request = @parser.parse(request_body)
+
+          expect(request).to be_invalid
         end
       end
 
       context "and is empty" do
-        it "raises an error" do
+        it "returns an invalid request" do
           request_body = '{"jsonrpc": "2.0", "method": null, "params": [42, 23], "id": 1}'
 
-          expect { @parser.parse(request_body) }.to raise_error(JsonRPC::InvalidRequestError)
+          request = @parser.parse(request_body)
+
+          expect(request).to be_invalid
         end
       end
 
       context "and is not an string" do
-        it "raises an error" do
+        it "returns an invalid request" do
           request_body = '{"jsonrpc": "2.0", "method": 3, "params": [42, 23], "id": 1}'
 
-          expect { @parser.parse(request_body) }.to raise_error(JsonRPC::InvalidRequestError)
+          request = @parser.parse(request_body)
+
+          expect(request).to be_invalid
         end
       end
     end
 
     context "when checking params field" do
       context "and is not an array or hash" do
-        it "raises an error" do
+        it "returns an invalid request" do
           request_body = '{"jsonrpc": "2.0", "method": "dostuff", "params": "bar"}'
 
-          expect { @parser.parse(request_body) }.to raise_error(JsonRPC::InvalidRequestError)
+          request = @parser.parse(request_body)
+
+          expect(request).to be_invalid
         end
       end
 
@@ -109,15 +119,25 @@ describe JsonRPC::Parser do
 
           expect(request.params).to eq([])
         end
+
+        it "returns a valid request" do
+          request_body = '{"jsonrpc": "2.0", "method": "dostuff"}'
+
+          request = @parser.parse(request_body)
+
+          expect(request).not_to be_invalid
+        end
       end
     end
 
     context "when checking id field" do
       context "and is not an string or integer" do
-        it "raises an error" do
+        it "returns an invalid request" do
           request_body = '{"jsonrpc": "2.0", "method": "dostuff", "params": [42, 23], "id": 4.5}'
 
-          expect { @parser.parse(request_body) }.to raise_error(JsonRPC::InvalidRequestError)
+          request = @parser.parse(request_body)
+
+          expect(request).to be_invalid
         end
       end
 
@@ -128,6 +148,14 @@ describe JsonRPC::Parser do
           request = @parser.parse(request_body)
 
           expect(request.id).to be_nil
+        end
+
+        it "returns a valid request" do
+          request_body = '{"jsonrpc": "2.0", "method": "dostuff"}'
+
+          request = @parser.parse(request_body)
+
+          expect(request).not_to be_invalid
         end
       end
     end
