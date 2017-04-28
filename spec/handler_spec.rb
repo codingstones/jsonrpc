@@ -23,7 +23,26 @@ describe JsonRPC::Handler do
 
       response = @handler.handle(request_body) { |request| nil }
 
-      expect(response).to include(:error)
+      expect(response).to include(error: be_an_invalid_json_error)
+    end
+  end
+
+  context "when receiving an invalid request" do
+    before(:each) do
+      allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(invalid: true))
+      @dispatcher = spy("dispatch")
+
+      @response = @handler.handle(request_body) do |request|
+        @dispatcher.dispatch(request.method, request.params)
+      end
+    end
+
+    it "does not execute yield block" do
+      expect(@dispatcher).not_to have_received(:dispatch)
+    end
+
+    it "returns an error request" do
+      expect(@response).to include(error: be_an_invalid_request_error)
     end
   end
 end

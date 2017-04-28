@@ -1,5 +1,6 @@
 require "bundler/setup"
 require "jsonrpc"
+require "support/matchers"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
