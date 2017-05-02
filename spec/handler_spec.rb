@@ -4,6 +4,7 @@ describe JsonRPC::Handler do
   before(:each) do
     @parser = instance_spy(JsonRPC::Parser)
     @handler = JsonRPC::Handler.new(@parser)
+    @dispatcher = spy("dispatch")
   end
 
   it "executes and return a jsonrcp response" do
@@ -30,7 +31,6 @@ describe JsonRPC::Handler do
   context "when receiving an invalid request" do
     before(:each) do
       allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(invalid: true))
-      @dispatcher = spy("dispatch")
 
       @response = @handler.handle(request_body) do |request|
         @dispatcher.dispatch(request.method, request.params)
@@ -52,9 +52,8 @@ describe JsonRPC::Handler do
         JsonRPC::Request.new(jsonrpc: "2.0", method: "subtract", params: [42, 23], id: 1),
         JsonRPC::Request.new(jsonrpc: "2.0", method: "add", params: [1, 3], id: 2)
       ])
-      @dispatcher = spy("dispatch")
 
-      @response = @handler.handle(request_body) do |request|
+      @handler.handle(request_body) do |request|
         @dispatcher.dispatch(request.method, request.params)
       end
 
@@ -67,7 +66,6 @@ describe JsonRPC::Handler do
   context "when receiving a notification" do
     before(:each) do
       allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(jsonrpc: "2.0", method: "subtract", params: [42, 23]))
-      @dispatcher = spy("dispatch")
 
       @response = @handler.handle(request_body) do |request|
         @dispatcher.dispatch(request.method, request.params)
