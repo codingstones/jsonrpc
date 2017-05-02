@@ -1,5 +1,6 @@
 describe JsonRPC::Handler do
   let(:request_body) { 'irrelevant request body' }
+  let(:an_id) { 1 }
 
   before(:each) do
     @parser = instance_spy(JsonRPC::Parser)
@@ -8,14 +9,14 @@ describe JsonRPC::Handler do
   end
 
   it "executes and return a jsonrcp response" do
-    allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(jsonrpc: "2.0", method: "subtract", params: [42, 23], id: 1))
+    allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(jsonrpc: "2.0", method: "subtract", params: [42, 23], id: an_id))
 
     response = @handler.handle(request_body) do |request|
       request.params[0] - request.params[1]
     end
 
     expect(response).to include(result: 19)
-    expect(response).to include(id: 1)
+    expect(response).to include(id: an_id)
   end
 
   context "when parser raises an error" do
@@ -60,6 +61,22 @@ describe JsonRPC::Handler do
       expect(@dispatcher).to have_received(:dispatch).twice
       expect(@dispatcher).to have_received(:dispatch).with("subtract", [42, 23])
       expect(@dispatcher).to have_received(:dispatch).with("add", [1, 3])
+    end
+
+    context "and contains a notification" do
+      it "does not return any notification response in batch responses" do
+        allow(@parser).to receive(:parse).and_return([
+          JsonRPC::Request.new(jsonrpc: "2.0", method: "subtract", params: [42, 23], id: an_id),
+          JsonRPC::Request.new(jsonrpc: "2.0", method: "add", params: [1, 3])
+        ])
+
+        response = @handler.handle(request_body) do |request|
+          nil
+        end
+
+        expect(response.length).to eq(1)
+        expect(response[0]).to have_id(an_id)
+      end
     end
   end
 

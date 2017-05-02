@@ -9,3 +9,9 @@ RSpec::Matchers.define :be_an_invalid_request_error do
     actual[:code] == -32600 && actual[:message] == "Invalid Request"
   end
 end
+
+RSpec::Matchers.define :have_id do |expected|
+  match do |actual|
+    actual[:id] == expected
+  end
+end
