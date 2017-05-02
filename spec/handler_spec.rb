@@ -63,4 +63,23 @@ describe JsonRPC::Handler do
       expect(@dispatcher).to have_received(:dispatch).with("add", [1, 3])
     end
   end
+
+  context "when receiving a notification" do
+    before(:each) do
+      allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(jsonrpc: "2.0", method: "subtract", params: [42, 23]))
+      @dispatcher = spy("dispatch")
+
+      @response = @handler.handle(request_body) do |request|
+        @dispatcher.dispatch(request.method, request.params)
+      end
+    end
+
+    it "executes yield block with parameters" do
+      expect(@dispatcher).to have_received(:dispatch).with("subtract", [42, 23])
+    end
+
+    it "does not return anything" do
+      expect(@response).to be_nil
+    end
+  end
 end

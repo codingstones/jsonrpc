@@ -28,7 +28,7 @@ module JsonRPC
       else
         result = block.call(request)
 
-        Response.new(request_id: request.id, result: result).to_json
+        Response.new(request_id: request.id, result: result).to_json unless request.notification?
       end
     end
   end
