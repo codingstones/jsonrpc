@@ -8,7 +8,7 @@ module JsonRPC
       request = @parser.parse(raw_request)
 
       if batch_request?(request)
-        request.map { |current_request| handle_request(current_request, block) }
+        request.map { |current| handle_request(current, block) }
       else
         handle_request(request, block)
       end
