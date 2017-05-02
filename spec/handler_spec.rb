@@ -20,12 +20,36 @@ describe JsonRPC::Handler do
   end
 
   context "when parser raises an error" do
-    it "returns an error request" do
+    it "returns an error response" do
       allow(@parser).to receive(:parse).and_raise(JsonRPC::InvalidJSONError)
 
       response = @handler.handle(request_body) { |request| nil }
 
       expect(response).to include(error: be_an_invalid_json_error)
+    end
+  end
+
+  context "when handler raises a method not found error" do
+    it "returns an error response" do
+      allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(jsonrpc: "2.0", method: "subtract", params: [42, 23], id: an_id))
+
+      response = @handler.handle(request_body) do |request|
+        raise JsonRPC::MethodNotFoundError
+      end
+
+      expect(response).to include(error: be_a_method_not_found_error)
+    end
+  end
+
+  context "when handler raises an invalid params error" do
+    it "returns an error response" do
+      allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(jsonrpc: "2.0", method: "subtract", params: [42, 23], id: an_id))
+
+      response = @handler.handle(request_body) do |request|
+        raise JsonRPC::InvalidParamsError
+      end
+
+      expect(response).to include(error: be_an_invalid_params_error)
     end
   end
 
