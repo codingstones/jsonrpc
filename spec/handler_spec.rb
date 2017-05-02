@@ -45,4 +45,22 @@ describe JsonRPC::Handler do
       expect(@response).to include(error: be_an_invalid_request_error)
     end
   end
+
+  context "when receiving a batch request" do
+    it "executes yield block for every request" do
+      allow(@parser).to receive(:parse).and_return([
+        JsonRPC::Request.new(jsonrpc: "2.0", method: "subtract", params: [42, 23], id: 1),
+        JsonRPC::Request.new(jsonrpc: "2.0", method: "add", params: [1, 3], id: 2)
+      ])
+      @dispatcher = spy("dispatch")
+
+      @response = @handler.handle(request_body) do |request|
+        @dispatcher.dispatch(request.method, request.params)
+      end
+
+      expect(@dispatcher).to have_received(:dispatch).twice
+      expect(@dispatcher).to have_received(:dispatch).with("subtract", [42, 23])
+      expect(@dispatcher).to have_received(:dispatch).with("add", [1, 3])
+    end
+  end
 end
