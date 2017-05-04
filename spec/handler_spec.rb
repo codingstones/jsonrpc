@@ -121,4 +121,24 @@ describe JsonRPC::Handler do
       expect(@response).to be_nil
     end
   end
+
+  context "when batch contains execution errors" do
+    it "returns responses for each error" do
+      other_id = 'other irrelevant id'
+
+      allow(@parser).to receive(:parse).and_return([
+        JsonRPC::Request.new(jsonrpc: "2.0", method: "subtract", params: [42, 23], id: an_id),
+        JsonRPC::Request.new(jsonrpc: "2.0", method: "add", params: [1, 3], id: other_id)
+      ])
+
+      response = @handler.handle(request_body) do |request|
+        raise JsonRPC::MethodNotFoundError if request.method == 'subtract'
+        raise JsonRPC::InvalidParamsError if request.method == 'add'
+      end
+
+      expect(response.length).to eq(2)
+      expect(response[0]).to include(error: be_a_method_not_found_error)
+      expect(response[1]).to include(error: be_an_invalid_params_error)
+    end
+  end
 end

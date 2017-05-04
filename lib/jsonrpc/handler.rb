@@ -23,13 +23,13 @@ module JsonRPC
     end
 
     def handle_request(request, block)
-      if request.invalid?
-        Response.new(request_id: request&.id, error: InvalidRequestError.new).to_json
-      else
-        result = block.call(request)
+      raise InvalidRequestError if request.invalid?
 
-        Response.new(request_id: request.id, result: result).to_json unless request.notification?
-      end
+      result = block.call(request)
+
+      Response.new(request_id: request.id, result: result).to_json unless request.notification?
+    rescue JsonRPC::Error => error
+      Response.new(request_id: request&.id, error: error).to_json
     end
   end
 end
