@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module JsonRPC
   class Handler
     def initialize(parser)

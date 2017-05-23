@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec::Matchers.define :be_an_invalid_json_error do
   match do |actual|
     actual[:code] == -32700 && actual[:message] == "Parse error"

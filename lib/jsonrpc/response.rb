@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module JsonRPC
   class Response
     def initialize(args)
@@ -8,7 +10,7 @@ module JsonRPC
 
     def to_json
       response = {
-        :jsonrpc => "2.0",
+        :jsonrpc => '2.0',
         :id => @request_id,
       }
 
