@@ -78,10 +78,10 @@ describe JsonRPC::Handler do
 
   context 'when receiving a batch request' do
     it 'executes yield block for every request' do
-      allow(@parser).to receive(:parse).and_return([
-        create_request(method: 'subtract', params: [42, 23], id: 1),
-        create_request(method: 'add', params: [1, 3], id: 2)
-      ])
+      allow(@parser).to receive(:parse).and_return(
+        [create_request(method: 'subtract', params: [42, 23], id: 1),
+         create_request(method: 'add', params: [1, 3], id: 2)]
+      )
 
       @handler.handle(request_body) do |request|
         @dispatcher.dispatch(request.method, request.params)
@@ -94,10 +94,10 @@ describe JsonRPC::Handler do
 
     context 'and contains a notification' do
       it 'does not return any notification response in batch responses' do
-        allow(@parser).to receive(:parse).and_return([
-          create_request(method: 'subtract', params: [42, 23], id: an_id),
-          create_request(method: 'add', params: [1, 3], id: nil)
-        ])
+        allow(@parser).to receive(:parse).and_return(
+          [create_request(method: 'subtract', params: [42, 23], id: an_id),
+           create_request(method: 'add', params: [1, 3], id: nil)]
+        )
 
         response = @handler.handle(request_body) { nil }
 
@@ -129,10 +129,10 @@ describe JsonRPC::Handler do
     it 'returns responses for each error' do
       other_id = 'other irrelevant id'
 
-      allow(@parser).to receive(:parse).and_return([
-        create_request(method: 'subtract', params: [42, 23], id: an_id),
-        create_request(method: 'add', params: [1, 3], id: other_id)
-      ])
+      allow(@parser).to receive(:parse).and_return(
+        [create_request(method: 'subtract', params: [42, 23], id: an_id),
+         create_request(method: 'add', params: [1, 3], id: other_id)]
+      )
 
       response = @handler.handle(request_body) do |request|
         raise JsonRPC::MethodNotFoundError if request.method == 'subtract'
