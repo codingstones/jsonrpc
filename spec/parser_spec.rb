@@ -35,7 +35,7 @@ describe JsonRPC::Parser do
 
       request = @parser.parse(request_body)
 
-      expect(request.params).to eq({'subtrahend': 23, 'minuend': 42})
+      expect(request.params).to eq(subtrahend: 23, minuend: 42)
     end
   end
 
@@ -165,10 +165,10 @@ describe JsonRPC::Parser do
 
   context 'when parsing a batch' do
     it 'parses all requests in the batch' do
-      request_body = %Q{[
+      request_body = %([
         {"jsonrpc": "2.0", "method": "notify_sum", "params": [1, 2, 4], "id": 30},
         {"jsonrpc": "2.0", "method": "notify_hello", "params": [7], "id": 31}
-      ]}
+      ])
 
       requests = @parser.parse(request_body)
 

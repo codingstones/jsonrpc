@@ -37,14 +37,12 @@ module JsonRPC
     def create_request(parsed)
       Request.new(validate(parsed))
     end
-  end
 
-  private
-
-  RequestSchema = Dry::Validation.Schema do
-    required(:jsonrpc).filled(:str?, eql?: '2.0')
-    required(:method).filled(:str?)
-    optional(:params) { type?(Array) | type?(Hash) }
-    optional(:id) { none? | type?(String) | type?(Integer) }
+    RequestSchema = Dry::Validation.Schema do
+      required(:jsonrpc).filled(:str?, eql?: '2.0')
+      required(:method).filled(:str?)
+      optional(:params) { type?(Array) | type?(Hash) }
+      optional(:id) { none? | type?(String) | type?(Integer) }
+    end
   end
 end

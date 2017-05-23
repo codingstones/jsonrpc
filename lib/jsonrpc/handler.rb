@@ -29,7 +29,9 @@ module JsonRPC
 
       result = block.call(request)
 
-      Response.new(request_id: request.id, result: result).to_json unless request.notification?
+      unless request.notification?
+        Response.new(request_id: request.id, result: result).to_json
+      end
     rescue JsonRPC::Error => error
       Response.new(request_id: request&.id, error: error).to_json
     end

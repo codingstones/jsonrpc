@@ -47,7 +47,7 @@ describe JsonRPC::Handler do
     it 'returns an error response' do
       allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(jsonrpc: '2.0', method: 'subtract', params: [42, 23], id: an_id))
 
-      response = @handler.handle(request_body) do |request|
+      response = @handler.handle(request_body) do
         raise JsonRPC::InvalidParamsError
       end
 
@@ -96,9 +96,7 @@ describe JsonRPC::Handler do
           JsonRPC::Request.new(jsonrpc: '2.0', method: 'add', params: [1, 3])
         ])
 
-        response = @handler.handle(request_body) do |request|
-          nil
-        end
+        response = @handler.handle(request_body)
 
         expect(response.length).to eq(1)
         expect(response[0]).to have_id(an_id)

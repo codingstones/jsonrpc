@@ -30,13 +30,17 @@ describe JsonRPC::Response do
     context 'when execution has an error' do
       before(:each) do
         @error = JsonRPC::InvalidRequestError.new
-        response = JsonRPC::Response.new(request_id: an_id, result: a_result, error: @error)
+        response = JsonRPC::Response.new(
+          request_id: an_id, result: a_result, error: @error
+        )
 
         @serialized = response.to_json
       end
 
       it 'contains an error field' do
-        expect(@serialized).to include(error: {code: @error.code, message: @error.message })
+        expect(@serialized).to include(
+          error: { code: @error.code, message: @error.message }
+        )
       end
 
       it 'does not contain a result field' do
