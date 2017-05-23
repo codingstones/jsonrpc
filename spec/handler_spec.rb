@@ -11,14 +11,15 @@ describe JsonRPC::Handler do
   end
 
   it 'executes and return a jsonrcp response' do
-    allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(jsonrpc: '2.0', method: 'subtract', params: [42, 23], id: an_id))
+    a_request = create_request
+    allow(@parser).to receive(:parse).and_return(a_request)
 
     response = @handler.handle(request_body) do |request|
       request.params[0] - request.params[1]
     end
 
     expect(response).to include(result: 19)
-    expect(response).to include(id: an_id)
+    expect(response).to include(id: a_request.id)
   end
 
   context 'when parser raises an error' do
@@ -33,7 +34,7 @@ describe JsonRPC::Handler do
 
   context 'when handler raises a method not found error' do
     it 'returns an error response' do
-      allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(jsonrpc: '2.0', method: 'subtract', params: [42, 23], id: an_id))
+      allow(@parser).to receive(:parse).and_return(create_request)
 
       response = @handler.handle(request_body) do
         raise JsonRPC::MethodNotFoundError
@@ -45,7 +46,7 @@ describe JsonRPC::Handler do
 
   context 'when handler raises an invalid params error' do
     it 'returns an error response' do
-      allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(jsonrpc: '2.0', method: 'subtract', params: [42, 23], id: an_id))
+      allow(@parser).to receive(:parse).and_return(create_request)
 
       response = @handler.handle(request_body) do
         raise JsonRPC::InvalidParamsError
@@ -57,7 +58,9 @@ describe JsonRPC::Handler do
 
   context 'when receiving an invalid request' do
     before(:each) do
-      allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(invalid: true))
+      allow(@parser).to receive(:parse).and_return(
+        create_request(invalid: true)
+      )
 
       @response = @handler.handle(request_body) do |request|
         @dispatcher.dispatch(request.method, request.params)
@@ -76,8 +79,8 @@ describe JsonRPC::Handler do
   context 'when receiving a batch request' do
     it 'executes yield block for every request' do
       allow(@parser).to receive(:parse).and_return([
-        JsonRPC::Request.new(jsonrpc: '2.0', method: 'subtract', params: [42, 23], id: 1),
-        JsonRPC::Request.new(jsonrpc: '2.0', method: 'add', params: [1, 3], id: 2)
+        create_request(method: 'subtract', params: [42, 23], id: 1),
+        create_request(method: 'add', params: [1, 3], id: 2)
       ])
 
       @handler.handle(request_body) do |request|
@@ -92,11 +95,11 @@ describe JsonRPC::Handler do
     context 'and contains a notification' do
       it 'does not return any notification response in batch responses' do
         allow(@parser).to receive(:parse).and_return([
-          JsonRPC::Request.new(jsonrpc: '2.0', method: 'subtract', params: [42, 23], id: an_id),
-          JsonRPC::Request.new(jsonrpc: '2.0', method: 'add', params: [1, 3])
+          create_request(method: 'subtract', params: [42, 23], id: an_id),
+          create_request(method: 'add', params: [1, 3], id: nil)
         ])
 
-        response = @handler.handle(request_body)
+        response = @handler.handle(request_body) { nil }
 
         expect(response.length).to eq(1)
         expect(response[0]).to have_id(an_id)
@@ -106,7 +109,7 @@ describe JsonRPC::Handler do
 
   context 'when receiving a notification' do
     before(:each) do
-      allow(@parser).to receive(:parse).and_return(JsonRPC::Request.new(jsonrpc: '2.0', method: 'subtract', params: [42, 23]))
+      allow(@parser).to receive(:parse).and_return(create_request(id: nil))
 
       @response = @handler.handle(request_body) do |request|
         @dispatcher.dispatch(request.method, request.params)
@@ -127,8 +130,8 @@ describe JsonRPC::Handler do
       other_id = 'other irrelevant id'
 
       allow(@parser).to receive(:parse).and_return([
-        JsonRPC::Request.new(jsonrpc: '2.0', method: 'subtract', params: [42, 23], id: an_id),
-        JsonRPC::Request.new(jsonrpc: '2.0', method: 'add', params: [1, 3], id: other_id)
+        create_request(method: 'subtract', params: [42, 23], id: an_id),
+        create_request(method: 'add', params: [1, 3], id: other_id)
       ])
 
       response = @handler.handle(request_body) do |request|
@@ -140,5 +143,12 @@ describe JsonRPC::Handler do
       expect(response[0]).to include(error: be_a_method_not_found_error)
       expect(response[1]).to include(error: be_an_invalid_params_error)
     end
+  end
+
+  def create_request(**params)
+    p = { jsonrpc: '2.0', method: 'subtract', params: [42, 23], id: an_id }
+    p.merge!(params)
+
+    JsonRPC::Request.new(p)
   end
 end
