@@ -2,41 +2,62 @@
 
 module JsonRPC
   class Error < StandardError
-    attr_reader :code
+    def initialize
+      super(self.class.message)
+    end
 
-    def initialize(code, message)
-      @code = code
-      super(message)
+    def code
+      self.class.code
     end
   end
 
   class InvalidJSONError < Error
-    def initialize
-      super(-32_700, 'Parse error')
+    def self.code
+      -32_700
+    end
+
+    def self.message
+      'Parse error'
     end
   end
 
   class InvalidRequestError < Error
-    def initialize
-      super(-32_600, 'Invalid Request')
+    def self.code
+      -32_600
+    end
+
+    def self.message
+      'Invalid Request'
     end
   end
 
   class MethodNotFoundError < Error
-    def initialize
-      super(-32_601, 'Method not found')
+    def self.code
+      -32_601
+    end
+
+    def self.message
+      'Method not found'
     end
   end
 
   class InvalidParamsError < Error
-    def initialize
-      super(-32_602, 'Invalid params')
+    def self.code
+      -32_602
+    end
+
+    def self.message
+      'Invalid params'
     end
   end
 
   class InternalError < Error
-    def initialize
-      super(-32_603, 'Internal error')
+    def self.code
+      -32_603
+    end
+
+    def self.message
+      'Internal error'
     end
   end
 end

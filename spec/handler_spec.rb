@@ -28,7 +28,7 @@ describe JsonRPC::Handler do
 
       response = @handler.handle(request_body)
 
-      expect(response).to include(error: be_an_invalid_json_error)
+      expect(response).to include(error: be_a_jsonrpc_error(JsonRPC::InvalidJSONError))
     end
   end
 
@@ -40,7 +40,7 @@ describe JsonRPC::Handler do
         raise JsonRPC::MethodNotFoundError
       end
 
-      expect(response).to include(error: be_a_method_not_found_error)
+      expect(response).to include(error: be_a_jsonrpc_error(JsonRPC::MethodNotFoundError))
     end
   end
 
@@ -52,7 +52,7 @@ describe JsonRPC::Handler do
         raise JsonRPC::InvalidParamsError
       end
 
-      expect(response).to include(error: be_an_invalid_params_error)
+      expect(response).to include(error: be_a_jsonrpc_error(JsonRPC::InvalidParamsError))
     end
   end
 
@@ -72,7 +72,7 @@ describe JsonRPC::Handler do
     end
 
     it 'returns an error request' do
-      expect(@response).to include(error: be_an_invalid_request_error)
+      expect(@response).to include(error: be_a_jsonrpc_error(JsonRPC::InvalidRequestError))
     end
   end
 
@@ -140,8 +140,8 @@ describe JsonRPC::Handler do
       end
 
       expect(response.length).to eq(2)
-      expect(response[0]).to include(error: be_a_method_not_found_error)
-      expect(response[1]).to include(error: be_an_invalid_params_error)
+      expect(response[0]).to include(error: be_a_jsonrpc_error(JsonRPC::MethodNotFoundError))
+      expect(response[1]).to include(error: be_a_jsonrpc_error(JsonRPC::InvalidParamsError))
     end
   end
 
