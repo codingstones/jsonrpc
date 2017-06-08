@@ -2,12 +2,19 @@
 
 module JsonRPC
   class Error < StandardError
-    def initialize
+    attr_reader :data
+
+    def initialize(data: nil)
       super(self.class.message)
+      @data = data
     end
 
     def code
       self.class.code
+    end
+
+    def data?
+      !@data.nil?
     end
   end
 

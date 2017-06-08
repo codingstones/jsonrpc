@@ -14,12 +14,10 @@ module JsonRPC
       if @error.nil?
         response[:result] = @result
       else
-        response[:error] =  {
-          code: @error.code,
-          message: @error.message
-        }
-      end
+        response[:error] = { code: @error.code, message: @error.message }
 
+        response[:error][:data] = @error.data if @error.data?
+      end
       response
     end
   end
