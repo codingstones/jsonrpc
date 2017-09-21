@@ -1,38 +1,61 @@
-# Jsonrpc
+# jsonrpc
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/jsonrpc`. To experiment with that code, run `bin/console` for an interactive prompt.
+[![Build Status](https://travis-ci.org/codingstones/jsonrpc.svg?branch=master)](https://travis-ci.org/codingstones/jsonrpc)
 
-TODO: Delete this and the text above, and describe your gem
+A Ruby implementation of [JSON-RPC 2.0](http://www.jsonrpc.org/specification). It's as simple as a parser and a response builder.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'jsonrpc'
+gem 'jsonrpc', git: 'https://github.com/codingstones/jsonrpc'
 ```
 
 And then execute:
 
     $ bundle
 
-Or install it yourself as:
-
-    $ gem install jsonrpc
+(We'll publish the gem to RubyGems soon).
 
 ## Usage
 
-TODO: Write usage instructions here
+How to build a JSON-RPC request:
 
-## Development
+```ruby
+require 'jsonrpc'
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+# First, we need a json with valid JSON-RPC format
+p = {
+    jsonrpc: '2.0',
+    params: [1, 2],
+    method: 'sum',
+    id: 'foo'
+}
+request_body = JSON.generate(p)
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+# Let's parse it!
+parser = JsonRPC::Parser.new
+request = parser.parse(request_body)
+request.invalid?  # false (validates the JSON-RPC format)
+request.version   # 2.0
+request.params    # [1, 2]
+request.id        # 'foo'
+request.method    # 'sum'
+```
+
+How to build a JSON-RPC response:
+
+```ruby
+response = JsonRPC::Response.new(request_id: 'foo', result: 3)
+response.to_json # {:jsonrpc=>"2.0", :id=>"foo", :result=>3}
+```
+
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/jsonrpc. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/codingstones/jsonrpc. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](https://www.contributor-covenant.org/version/1/4/code-of-conduct/) code of conduct.
 
 
 ## License
